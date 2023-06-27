@@ -16,28 +16,24 @@ import { Request, Response } from "express";
   app.use(bodyParser.json());
 
   app.get('/', (req, res) => {
-    res.send("'hello world' is running");
+    res.send("try GET /filteredimage?image_url={{}}");
   })
 
   app.get("/filteredimage", async (req: Request, res: Response) => {
     const imgPath = req.query["image_url"];
     if (imgPath) {
       const imageFiltered = await filterImageFromURL(imgPath.toString());
-      console.log('imageFiltered -----------------', imageFiltered)
       if (imageFiltered) {
         res.sendFile(imageFiltered, {}, (error) => {
           if (error) {
-            console.log("Appeared error while sending file");
             return res.status(500).send("Appeared error while sending file");
           }
           deleteLocalFiles([imageFiltered]);
         });
       } else {
-        console.log("Filtered image could not find MIME for Buffer <null>");
         return res.status(500).send("Filtered image could not find MIME for Buffer <null>");
       }
     } else {
-      console.log("imgPath query is not provided");
       return res.status(400).send("imgPath query is not provided");
     }
   });
